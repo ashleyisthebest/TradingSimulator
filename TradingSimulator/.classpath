@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="lib/jFreeChart/src"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="lib/CopyLibs/org-netbeans-modules-java-j2seproject-copylibstask.jar"/>
+	<classpathentry kind="lib" path="lib/derbyclient.jar"/>
+	<classpathentry kind="lib" path="lib/jFreeChart/gnujaxp.jar"/>
+	<classpathentry kind="lib" path="lib/jFreeChart/junit.jar"/>
+	<classpathentry kind="lib" path="lib/jFreeChart/servlet.jar"/>
+	<classpathentry kind="lib" path="lib/jxbrowser-7.1.jar"/>
+	<classpathentry kind="lib" path="lib/jxbrowser-javafx-7.1.jar"/>
+	<classpathentry kind="lib" path="lib/jxbrowser-linux64-7.1.jar"/>
+	<classpathentry kind="lib" path="lib/jxbrowser-mac-7.1.jar"/>
+	<classpathentry kind="lib" path="lib/jxbrowser-swing-7.1.jar"/>
+	<classpathentry kind="lib" path="lib/jxbrowser-win32-7.1.jar"/>
+	<classpathentry kind="lib" path="lib/jxbrowser-win64-7.1.jar"/>
+	<classpathentry kind="output" path="build/classes"/>
+</classpath>
