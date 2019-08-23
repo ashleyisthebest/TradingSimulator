@@ -1,5 +1,6 @@
 package tradingsimulator;
 
+import org.json.*;
 public class MainWindow extends javax.swing.JFrame {
     
     //Public data in an array for the graph
@@ -19,6 +20,7 @@ public class MainWindow extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -26,6 +28,7 @@ public class MainWindow extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Trading Simulator by Ashley Best");
+        setResizable(false);
 
         jTabbedPane1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jTabbedPane1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
@@ -44,6 +47,8 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
 
+        jLabel1.setText("NOTE TO SELF: org.json library installed to parse json - find api in favourites + key");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -55,7 +60,9 @@ public class MainWindow extends javax.swing.JFrame {
                 .addComponent(jLabel3)
                 .addGap(142, 142, 142))
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(306, 306, 306)
+                .addGap(113, 113, 113)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton1)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -67,7 +74,9 @@ public class MainWindow extends javax.swing.JFrame {
                     .addComponent(jLabel2)
                     .addComponent(jLabel3))
                 .addGap(201, 201, 201)
-                .addComponent(jButton1)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton1)
+                    .addComponent(jLabel1))
                 .addContainerGap(311, Short.MAX_VALUE))
         );
 
@@ -99,10 +108,18 @@ public class MainWindow extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("Previous Investments", jPanel3);
 
+        jScrollPane1.setFont(new java.awt.Font("Tahoma", 0, 36)); // NOI18N
+
+        jList1.setFont(new java.awt.Font("Segoe UI", 1, 44)); // NOI18N
         jList1.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            String[] strings = { "SBUX", "AAPL", "NXPI", "FB", "SFIX", "JNJ", "CNC", "SFM", "DOW", "GOOGL" };
             public int getSize() { return strings.length; }
             public String getElementAt(int i) { return strings[i]; }
+        });
+        jList1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jList1MouseClicked(evt);
+            }
         });
         jScrollPane1.setViewportView(jList1);
 
@@ -111,8 +128,9 @@ public class MainWindow extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(2, 2, 2)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 810, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -132,6 +150,15 @@ public class MainWindow extends javax.swing.JFrame {
     price[1] = 6;
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void jList1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jList1MouseClicked
+        //Determining which value the user clicked
+        System.out.println(jList1.getSelectedValue());
+        readJSON();
+    }//GEN-LAST:event_jList1MouseClicked
+
+    public static void readJSON(){
+
+    }
     
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -167,6 +194,7 @@ public class MainWindow extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JList<String> jList1;
