@@ -1,8 +1,12 @@
 package tradingsimulator;
 
-import org.json.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+import org.json.JSONObject;
+
 public class MainWindow extends javax.swing.JFrame {
-    
+
     //Public data in an array for the graph
     public static double[] time = new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     public static double[] price = new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
@@ -112,7 +116,7 @@ public class MainWindow extends javax.swing.JFrame {
 
         jList1.setFont(new java.awt.Font("Segoe UI", 1, 44)); // NOI18N
         jList1.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "SBUX", "AAPL", "NXPI", "FB", "SFIX", "JNJ", "CNC", "SFM", "DOW", "GOOGL" };
+            String[] strings = { "SBUX", "AAPL", "NXPI", "FB", "MSFT", "JNJ", "CNC", "SFM", "DOW", "GOOGL" };
             public int getSize() { return strings.length; }
             public String getElementAt(int i) { return strings[i]; }
         });
@@ -146,20 +150,43 @@ public class MainWindow extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-    //Pressing this proves that the data on the main class can be changed from this button
-    price[1] = 6;
+        //Pressing this proves that the data on the main class can be changed from this button
+        price[1] = 6;
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jList1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jList1MouseClicked
         //Determining which value the user clicked
         System.out.println(jList1.getSelectedValue());
-        readJSON();
+        readJSON(jList1.getSelectedValue());
+
     }//GEN-LAST:event_jList1MouseClicked
 
-    public static void readJSON(){
+    public static void readJSON(String selectedValue) {
+        try {
+            //Create API url with selected value
+            URL url = new URL("https://www.alphavantage.co/query?function=TIME_SERIES_WEEKLY&symbol=" + selectedValue + "&apikey=7LZXYYMRTW7J9GJA");
 
+            //Get text from URL
+            BufferedReader input = new BufferedReader(new InputStreamReader(url.openStream()));
+
+            //Loop through the text from the API and make string
+            //Using system.lineseperator to prevent issues with json parsing
+            String webContent = "";
+            while ((input.readLine()) != null) {
+                webContent += input.readLine() + System.lineSeparator();
+                //System.out.println(input.readLine());
+            }
+            input.close();
+            System.out.println(webContent);
+            
+            //Convert the string into a JSONObject
+            JSONObject contentAsObject = new JSONObject(webContent);
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
     }
-    
+
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
