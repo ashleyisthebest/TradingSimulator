@@ -1,10 +1,50 @@
-
 package tradingsimulator;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import javax.swing.JOptionPane;
 
 public class LoginWindow extends javax.swing.JFrame {
 
+    //Global username string to be accessed on other classes. Will be updated once user logs in
+    public static userObject user = new userObject(0, null, null);
+
+    //Database public variables
+    Connection dbConnection;
+    Statement dbStatement;
+    ResultSet dbResultSet;
+
     public LoginWindow() {
         initComponents();
+        connectDB();
+    }
+
+    public void connectDB() {
+
+        try {
+
+            //Database login details
+            String host = "jdbc:derby://localhost:1527/MainDB";
+            String username = "root";
+            String password = "password";
+
+            //Connect to database
+            dbConnection = DriverManager.getConnection(host, username, password);
+            System.out.println("Successful Connection");
+
+            //Load resultset and make resultset updatable
+            dbStatement = dbConnection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            String SQLQuery = "Select * FROM tblUser";
+            dbResultSet = dbStatement.executeQuery(SQLQuery);
+
+        } catch (SQLException e) {
+
+            JOptionPane.showMessageDialog(null, e, "Error", JOptionPane.WARNING_MESSAGE);
+
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -16,9 +56,9 @@ public class LoginWindow extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
-        jTextField2 = new javax.swing.JTextField();
         jCheckBox1 = new javax.swing.JCheckBox();
         jButton1 = new javax.swing.JButton();
+        jPasswordField1 = new javax.swing.JPasswordField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
@@ -36,8 +76,6 @@ public class LoginWindow extends javax.swing.JFrame {
         jLabel4.setText("NEW ACCOUNT:");
 
         jTextField1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-
-        jTextField2.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
 
         jCheckBox1.setBorderPaintedFlat(true);
         jCheckBox1.setMargin(new java.awt.Insets(-2, -2, -2, -2));
@@ -62,9 +100,9 @@ public class LoginWindow extends javax.swing.JFrame {
                     .addComponent(jLabel2))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jTextField1)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 231, Short.MAX_VALUE)
-                    .addComponent(jCheckBox1))
+                    .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 231, Short.MAX_VALUE)
+                    .addComponent(jCheckBox1)
+                    .addComponent(jPasswordField1))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(206, Short.MAX_VALUE)
@@ -88,29 +126,128 @@ public class LoginWindow extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addComponent(jPasswordField1, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 8, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jCheckBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel4))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton1)
-                .addContainerGap(19, Short.MAX_VALUE))
+                .addGap(18, 18, 18))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        
-        if (jTextField1.getText().equals("root")) {
-            
+
+        //Getting user entered data
+        String username = jTextField1.getText();
+        String password = jPasswordField1.getText();
+
+        //Purposely not using seperare methods as this will only be done once and methods will make it harder
+        //If they are creating a new account
+        if (jCheckBox1.isSelected()) {
+
+            try {
+
+                //Generate userID
+                dbStatement = dbConnection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                //Get userID values in order of descending
+                String SQLQuery = "SELECT * FROM tblUser\n"
+                        + "ORDER  BY userID DESC\n";
+
+                dbResultSet = dbStatement.executeQuery(SQLQuery);
+
+                //Finding the most recent userID
+                int userID = 0;
+                while (dbResultSet.first()) {
+                    userID = Integer.valueOf(dbResultSet.getString("userID"));
+                    System.out.println("Most recent uderID: " + userID);
+                    break;
+                }
+
+                //Refresh result set
+                SQLQuery = "Select * FROM tblUser";
+                dbResultSet = dbStatement.executeQuery(SQLQuery);
+
+                //Go to end of resultset
+                dbResultSet.moveToInsertRow();
+
+                //Save new details
+                dbResultSet.updateInt("userID", userID + 1);
+                dbResultSet.updateString("username", username);
+                dbResultSet.updateString("password", password);
+                dbResultSet.insertRow();
+
+                dbStatement.close();
+                dbResultSet.close();
+
+                //Update database
+                dbStatement = dbConnection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                dbResultSet = dbStatement.executeQuery(SQLQuery);
+
+                //Add details to object
+                user.userID = userID + 1;
+                user.username = username;
+                user.password = password;
+
+            } catch (SQLException e) {
+
+                //Presenting error message if username has been used
+                if (e.toString().contains("duplicate")) {
+                    JOptionPane.showMessageDialog(null, "Username already in use", "Error", JOptionPane.WARNING_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(null, e, "Error", JOptionPane.WARNING_MESSAGE);
+                }
+
+                System.out.println(e);
+            }
+            //Open main window
             this.setVisible(false);
-            
-            MainWindow mw = new MainWindow();            
+            MainWindow mw = new MainWindow();
             mw.setVisible(true);
-            
+        } else {
+            //If they are logging in to an existing account
+            try {
+                //Refresh result set
+                dbStatement = dbConnection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                //Find username in DB
+                String SQLQuery = "SELECT * FROM tblUser WHERE username='" + username + "'";
+                dbResultSet = dbStatement.executeQuery(SQLQuery);
+
+                String dbUsername = "";
+                String dbPassword = "";
+                int dbID = 0;
+
+                //Get username and password as string
+                while (dbResultSet.next()) {
+                    dbUsername = dbResultSet.getString("username");
+                    dbPassword = dbResultSet.getString("password");
+                    dbID = Integer.valueOf(dbResultSet.getString("userID"));
+                }
+
+                //Check the username and password match
+                if (username.equals(dbUsername) && password.equals(dbPassword)) {
+                    System.out.println("Logging in");
+                    //Adding details to user object
+                    user.username = dbUsername;
+                    user.password = dbPassword;
+                    user.userID = dbID;
+
+                    //Open main window
+                    this.setVisible(false);
+                    MainWindow mw = new MainWindow();
+                    mw.setVisible(true);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Incorrect password.", "Error", JOptionPane.WARNING_MESSAGE);
+                }
+
+            } catch (SQLException e) {
+                System.out.println(e);
+            }
         }
+
 
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -156,7 +293,7 @@ public class LoginWindow extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JPasswordField jPasswordField1;
     private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
     // End of variables declaration//GEN-END:variables
 }
